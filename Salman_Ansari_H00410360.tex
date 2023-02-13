@@ -1,0 +1,244 @@
+\documentclass[11pt]{article}
+
+%for math functions
+\usepackage{mathtools}
+
+% To add header
+\usepackage{fancyhdr}
+
+% for figure captions
+\usepackage{caption}
+
+% for links
+\usepackage{hyperref}
+
+%\usepackage{biblatex} 
+
+% to include images
+\usepackage{graphicx}
+
+% for equation environments
+\usepackage{amsmath, amssymb}
+
+% for code snippets
+\usepackage{listings}
+
+\renewcommand{\footrulewidth}{.5pt}
+
+% To add proper geometry to report
+\usepackage[margin=2cm]{geometry}
+
+\pagestyle{fancy}
+\lhead{F21SA Statistical Modelling and Analysis}
+\rhead{Salman Ansari H00410360}
+
+% PROJECT TITLE
+\title{F21SA Coursework 1\Large }
+
+\begin{document}
+
+\begin{center}
+  \Large{F21SA Coursework 1}
+\end{center}
+
+\section*{1. Introduction}
+
+In this coursework, we are provided with a csv file which contains the distribution of file sizes sent through an internet network. We have to use the Pareto statistical model and model those sizes by the Maximum Likelihood estimation method.
+
+We have access to $\underline{x}$, which contains sizes in kB of 1000 randomly selected files that were recently sent through the network. We are also provided with the Probability Density Function (PDF) as 
+
+\begin{equation}
+f\left(x, \alpha, x_{m}\right)= \begin{cases}\frac{\alpha x_{m}^{\alpha}}{x^{\alpha+1}}, & x \geq x_{m} \\ 0, & x<x_{m}\end{cases}\\
+\end{equation}
+
+\section*{2. Data Summarization}
+
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics[width = 6.5cm]{Hist_file_size.png}
+    \captionof{figure}{Histogram of File size} 
+    \label{fig:hist}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \begin{lstlisting}[caption={Numerical Summary},
+                        label={list:summary},
+                        captionpos=b]
+     summary(file_size)
+           x         
+           
+     Min.   : 1000  
+     1st Qu.: 1098  
+     Median : 1285 
+     Mean   : 1622  
+     3rd Qu.: 1637  
+     Max.   : 77538
+     S.D.   : 2552.119
+     Var.   : 6513309
+     IQR    : 539
+     
+    \end{lstlisting}
+\end{minipage} \\
+\par Figure \ref{fig:hist} and Listing \ref{list:summary} displays the Histogram and the Numerical Summary of the file size data respectively. The file size data has a mean of $1622$kB, median of $1285$kB, standard deviation of $2552.119$kB, Q1 of $1098$kB, Q3 of $1637$kB, and an IQR of $539$kB. This explains that the average file size is about $1622$, and usually not over $1637$kB or under $1098$kB.\\
+
+\par We can observe from the histogram that the distribution is positively skewed. This is also correct because the file size of any transferred file cannot be negative.
+
+\section*{3. Maximum Likelihood Estimation (MLE)}
+
+The likelihood function is,
+\begin{equation}
+\begin{split}
+\mathcal{L}\left(x, \alpha, x_{m}\right)=\prod_{i=1}^{n} \frac{\alpha x_{i}^{\alpha}}{x_{i}^{\alpha+1}}=\alpha^{n} x_{i}^{n \alpha} \prod_{i=1}^{n} \frac{1}{x_{i}^{\alpha+1}} \\
+\end{split}
+\end{equation}
+The log-likelihood function is,
+\begin{equation}
+\begin{split}
+=\left(\left(\alpha x_{m}^{\alpha}\right)^{m}\right)-\left(\sum_{i=1}^{m} \ln x_{i}^{\alpha+1}\right) \\
+\end{split}
+\begin{split}
+=m \ln \left(\alpha x_{m}^{\alpha}\right)- \left(\sum_{i=1}^{m}\ln x_{i}^{\alpha+1}\right) \\
+\end{split}
+\end{equation}
+\begin{equation}
+\begin{split}
+=m \ln \alpha+m \alpha \ln \left(x_{m}\right)-\ln \left(x_{m}\right)- \sum_{i=1}^{m} \ln x_{i}^{\alpha+1} \\
+\end{split}
+\end{equation}
+To obtain the MLE for $\alpha$, $\hat{\alpha}$, we solve for 0 after calculating the first derivative.
+\begin{equation}
+\begin{split}
+=\frac{\partial}{\partial \alpha}(m \ln \alpha)+\frac{\partial}{\partial \alpha}\left(m \alpha \ln x_{m}\right)-\frac{\partial}{\partial \alpha}\left((\alpha+1) \sum_{i=1}^{m} \ln x_{i}\right) \\
+\end{split}
+\end{equation}
+\begin{equation}
+\begin{split}
+\Rightarrow \frac{m}{\hat{a}}+m \ln \left(x_{m}\right)-\sum_{i=1}^{m} \ln x_i=0 \\
+\end{split}
+\end{equation}
+\begin{equation}
+\begin{split}
+\Rightarrow \frac{m}{\hat{a}}=\sum_{i=1}^{m} \ln x_{i}-m \ln x_{m} \\
+\end{split}
+\end{equation}
+\begin{equation}
+\begin{split}
+\Rightarrow \boxed {\hat{\alpha}=\frac{m}{\sum_{i=1}^{m} \ln x_{i}-m \ln x_{m}}} \\
+\label{eq:8}
+\end{split}
+\end{equation}
+
+\section*{4. Fisher information for $\alpha$ to approximate the distribution of $\hat{\alpha}$}
+
+The Fisher information is found as follows:-
+\begin{equation}
+\begin{split}
+I(\alpha) = -\biggl[E\left[{\frac{\partial^{2}\ell}{\partial\alpha^{2}}}\right]\biggr] \\
+\end{split}
+\end{equation}
+\begin{equation}
+\begin{split}
+I(\alpha) = -{\frac{\partial^2}{\partial \alpha^2}}\Biggl[{\frac{m}{\alpha}}+m\ln{x_m} - {\sum_{i=1}^{m} \ln x_i}\Biggr] \\
+\end{split}
+\end{equation}
+\begin{equation}
+\begin{split}
+= -\biggl[{\frac{-m}{\alpha^{2}} + 0}\biggr]\\
+\Rightarrow \boxed {I(\alpha)= \frac{m}{\alpha^2}}
+\label{eq:11}
+\end{split}
+\end{equation}
+For large $ m $, $ \hat\alpha $ is approximately distributed as $ N(\alpha, \frac{1}{I(\alpha)}) $. In our case it is $ N(\alpha, \frac{\alpha^2}{m}) $.
+
+\section*{5. 95\% Confidence Interval (CI) for $\hat{\alpha}$}
+
+\begin{equation}
+\begin{split}
+[\alpha_{L}(\underline x),\alpha_{U}(\underline x)] &= {\hat{\alpha}}\pm({Z_{\frac{\alpha}{2}} * ese(\hat{\alpha})})
+\label{eq:12}
+\end{split}
+\end{equation}
+From eq. \eqref{eq:8}, we have,
+\begin{equation}
+\begin{split}
+\hat{\alpha} &= {\frac{m}{\sum_{i=1}^{m} \ln x_i - m\ln{x_m}}}\\
+\label{eq:13}
+\end{split}
+\end{equation}
+\\
+The value of $ \hat\alpha $ is 2.793079. [Refer Appendix for R code] \\
+From eq. \eqref{eq:11}, we have,
+\begin{equation}
+\begin{split}
+ese(\hat{\alpha}) = \sqrt{\frac{1}{I(\hat{\alpha})}} = \sqrt{\frac {\hat{\alpha}^2}{m}}
+\end{split}
+\end{equation}
+The value of $ ese(\hat\alpha) $ is 0.08832491. [Refer Appendix for R code] \\
+\\
+Substituting the values of $ \hat\alpha $ and $ ese(\hat\alpha) $ in eq.\eqref{eq:12} and with $Z_{\frac{\alpha}{2}} = 1.96$ taken from NCST Table 5 [1], the confidence interval is
+\begin{equation}
+\begin{split}
+I_{0.95} = [\alpha_{L}(\underline x),\alpha_{U}(\underline x)] \approx [ 2.619965 , 2.966192 ]
+\end{split}
+\end{equation}
+
+\section*{6. Estimation of $Y'$}
+
+\par By letting $X'_{i}\sim\text{Pareto}(\hat{\alpha},x_m)$, and $Y' = \frac{1}{1000}\sum_{i=1}^{1000}X'_{i}$ be the predicted mean file size, R is used to simulate the predicted file sizes and find the distribution of $Y'$. 
+
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics[width = 6.5cm]{Histogram_Average_File_size.png}
+    \captionof{figure}{Histogram of Average File size} 
+    \label{fig:hist_average}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \begin{lstlisting}[caption={Numerical Summary},
+                        label={list:summary2},
+                        captionpos=b]
+     summary(average_file_size)
+           x         
+           
+     Min.   : 1463
+     1st Qu.: 1535
+     Median : 1555
+     Mean   : 1557 
+     3rd Qu.: 1577
+     Max.   : 1972
+     S.D.   : 32.5771
+     Var.   : 1061.267
+     IQR    : 42
+     
+    \end{lstlisting}
+\end{minipage} \\
+
+\par It seems from simulation in R that the predicted mean file sizes has an approximate Normal distribution. The simulation is set at 10,000 times and by using the rPareto(n,t,$\alpha$) function, where n is length(file size), t is $x_m$ and $\alpha$ is $\hat\alpha$. \\
+\par From the results, we can see that the average file size is in the range of 1463 kB and 1972 kB with interquartile range of 42 kB.
+
+\section*{7. Maximum Possible Limit}
+
+We are supposed to set an upper limit on the file size to discard the files that are above the limit. We need to find the max possible limit to accept atleast 99$\%$ of the incoming files. \\
+
+To implement this, I've made use of the qPareto(p,t,$\alpha$) function where p,t and $\alpha$ are 0.99, 1000 (file size data length) and  2.793079 (from eq. \eqref{eq:13}) respectively. \\
+
+After calculation, the function returned the value as 5200.627 kB. [Refer Appendix for R code]\\
+
+From this calculation, we understand that 99$\%$ of the values in the dataset are below 5200 kB. So the maximum possible limit such that 99$\%$ of the files will be accepted would be 5200 kB.
+
+\section*{8. Conclusion}
+
+We have successfully analyzed the dataset which contains the distribution of file sizes that are being sent over the network using Pareto Statistical Model. Also, we found that the mean file sizes has a normal distribution after running multiple simulations. We also found the limit on the file size, so that the files of size that are higher than the limit will be rejected but also 99$\%$ of the files would still be accepted by the network.\\
+
+\begin{thebibliography}{}
+\bibitem{NCST} Lindley, D. and Scott, W., 1995. New Cambridge Statistical Tables. 2nd ed. New York: Cambridge University Press. 
+\bibitem {r}https://www.statisticshowto.com/fisher-information/
+\bibitem {r}https://online.stat.psu.edu/stat415/lesson/1/1.2
+\end{thebibliography}
+
+\newpage
+\section*{Appendix}
+\subsection*{CW1.r}
+\lstinputlisting[language=R]{CW1.r}
+
+\end{document}
